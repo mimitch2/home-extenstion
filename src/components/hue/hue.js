@@ -5,19 +5,18 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
+import './hue.scss';
 
 const Hue = ({ lights, getHueData }) => {
     const [showPicker, setShowPicker] = useState(false);
     const [hueValue, setHueValue] = useState(35000);
     const [brightness, setBrightness] = useState(200);
+    const [saturation, setSaturation] = useState(0);
     const [light, setLight] = useState(1);
     const [isOn, setIsOn] = useState([]);
 
     const lightSwitch = async({ lt }) => {
-        // console.log('lightSwitch -> lt', lt);
         const thisLight = _.find(lights, (lght) => { return lights.indexOf(lght) === lt - 1; });
-        // console.log('lightSwitch -> thisLight', thisLight);
-
         setIsOn(_.filter(isOn, (bulb) => { return bulb !== lt; }));
 
         try {
@@ -30,9 +29,11 @@ const Hue = ({ lights, getHueData }) => {
 
             getHueData();
         } catch (error) {
+            // eslint-disable-next-line no-console
             console.log(error);
         }
     };
+
 
     const colorPicker = ({ lt }) => {
         setShowPicker(!showPicker);
@@ -41,85 +42,97 @@ const Hue = ({ lights, getHueData }) => {
         setBrightness(lights[lt - 1].state.bri);
     };
 
-    const changeColor = (e) => {
-        const hue = Math.floor(e.target.value);
-        setHueValue(hue);
+    const setLightValues = ({ e, setting }) => {
+        const value = Math.floor(e.target.value);
+
+        if (setting === 'bri') {
+            setBrightness(value);
+        } else if (setting === 'hue') {
+            setHueValue(value);
+        } else {
+            setSaturation(value);
+        }
 
         fetch(`${process.env.REACT_APP_HUE_ENDPOINT}/lights/${light}/state`, {
             method: 'PUT',
             body: JSON.stringify({
-                hue,
+                [setting]: value,
             }),
         });
     };
 
-    const changeBrightness = (e) => {
-        const value = _.toNumber(e.target.value);
-        setBrightness(value);
-        fetch(`${process.env.REACT_APP_HUE_ENDPOINT}/lights/${light}/state`, {
-            method: 'PUT',
-            body: JSON.stringify({
-                bri: brightness,
-            }),
-        });
-    };
+    return (lights
+        ? (
+            <div className="hue-controls-container">
+                {_.map(lights, (lt, idx) => {
+                    return (
+                        <div
+                            className="color-picker-title"
+                            key={lt.name}
+                        >
+                            <button
+                                onClick={() => {
+                                    lightSwitch({ lt: idx + 1 });
+                                }}
+                            >CLICK
+                            </button>
+                            <span onClick={() => { colorPicker({ lt: idx + 1 }); }}>
+                                {lt.name}
+                            </span>
+                        </div>
+                    );
+                })}
 
+                {showPicker
+                    ? (
+                        <div className="color-picker-div">
+                            <div className="color-picker-wrapper">
+                                <div className="slider-wrapper">
+                                    <input
+                                        type="range"
+                                        min="1"
+                                        max="65535"
+                                        className="slider hue"
+                                        onChange={(e) => { setLightValues({ e, setting: 'hue' }); }}
+                                        value={hueValue}
+                                    />
+                                </div>
+                                <div className="slider-wrapper">
+                                    <input
+                                        type="range"
+                                        min="1"
+                                        max="254"
+                                        className="slider brightness"
+                                        onChange={(e) => { setLightValues({ e, setting: 'bri' }); }}
+                                        value={brightness}
+                                    />
+                                </div>
 
-    return (
-        <div>
-            {_.map(lights, (lt, idx) => {
-                return (
-                    <div
-                        className="color-picker-title"
-                        key={lt.name}
-                    >
-                        <button
-                            onClick={() => {
-                                lightSwitch({ lt: idx + 1 });
-                            }}
-                        >CLICK
-                        </button>
-                        <span onClick={() => { colorPicker({ lt: idx + 1 }); }}>
-                            {lt.name}
-                        </span>
-                    </div>
-                );
-            })}
+                                <div className="slider-wrapper">
+                                    <input
+                                        type="range"
+                                        min="1"
+                                        max="254"
+                                        className="slider saturation"
+                                        onChange={(e) => { setLightValues({ e, setting: 'sat' }); }}
+                                        value={saturation}
+                                    />
+                                </div>
 
-            {
-                showPicker
-            && <div className="color-picker-div">
-                <div className="color-picker-wrapper">
-                    <div className="brightness-slider-wrapper">
-                        <input
-                            type="range"
-                            min="0"
-                            max="65535"
-                            className="slider hue"
-                            onChange={changeColor}
-                            value={hueValue}
-                        />
-                    </div>
-                    <div className="brightness-slider-wrapper">
-                        <input
-                            type="range"
-                            min="0"
-                            max="254"
-                            className="slider brightness"
-                            onChange={changeBrightness}
-                            value={brightness}
-                        />
-                    </div>
-
-                </div>
-               </div>
-            }
-        </div>
+                            </div>
+                        </div>) : null}
+            </div>) : null
     );
 };
 
 Hue.propTypes = {
-    lights: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    lights: PropTypes.arrayOf(PropTypes.shape({
+        state: PropTypes.shape({
+            bri: PropTypes.number.isRequired,
+            hue: PropTypes.number.isRequired,
+            satu: PropTypes.number.isRequired,
+        }),
+    })).isRequired,
     getHueData: PropTypes.func.isRequired,
 };
 

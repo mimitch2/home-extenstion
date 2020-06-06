@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
-import logo from './logo.svg';
 import './App.scss';
-import { Hue } from './components';
+import { Hue, Sonos } from './components';
 
 const App = () => {
     const [hueData, setHueData] = useState([]);
+    // const [sonosData, setSonosData] = useState([]);
 
     const getHueData = async() => {
         // eslint-disable-next-line no-undef
@@ -19,16 +19,15 @@ const App = () => {
 
     useEffect(() => {
         getHueData();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
 
     return (
         <div className="App">
-            <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo" />
-                <Hue lights={hueData} getHueData={getHueData} />
-            </header>
+            <Hue lights={hueData} getHueData={getHueData} />
+            {/* <Sonos /> */}
         </div>
     );
 };
