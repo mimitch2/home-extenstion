@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
-import './App.scss';
-import { Hue, Sonos } from './components';
+import 'App.scss';
+import { Hue, Sonos } from 'components';
 
 const App = () => {
     const [hueData, setHueData] = useState([]);
