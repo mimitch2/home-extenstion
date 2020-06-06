@@ -1,40 +1,55 @@
 @import 'scss/_variables.scss';
 
 .hue-controls-container {
-    // margin-left: 8px;
-    // display: flex;
-    // height: 50px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
 
     .color-picker-title {
-        border-radius: 3px;
         user-select: none;
         cursor: pointer;
         padding: 1px 2px 0px 2px;
         margin: 0px 3px 0px 2px;
         height: 24px;
-        // &:hover {
-        //     background: $secondary-color;
-        //     color: $primary-color;
-        // }
     }
-    .light-controls {
-        display: flex;
-        width: 70px;
 
-        .carret-div {
-            display: flex;
-            cursor: pointer;
-            margin-left: 5px;
-            margin-top: -2px;
-        }
-        .fa-caret-right {
-            transition: transform 0.1s linear;
-            font-size: 32px;
-            color: #afafaf;
-        }
+    .checkbox {
+        display: block;
+        position: relative;
+        cursor: pointer;
+        font-size: 22px;
+        line-height: 24px;
+        height: 16px;
+        width: 16px;
+        left: -28px;
+        bottom: 22px;
+    }
+
+    .checkbox input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .checkbox-custom {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        height: 16px;
+        width: 16px;
+        background-color: transparent;
+        transition: all 0.1s ease-out;
+        border: 2px solid #ffffff;
+    }
+
+    .checkbox input:checked ~ .checkbox-custom {
+        background-color: green;
+        border-radius: 2px;
+        box-shadow: 0px 0px 6px green;
     }
 
     .color-picker-wrapper {
+        // position: absolute;
         width: 300px;
         height: 10px;
     }

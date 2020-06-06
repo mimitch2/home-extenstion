@@ -26,7 +26,7 @@ const App = () => {
 
     return (
         <div className="App">
-            <Hue lights={hueData} getHueData={getHueData} />
+            <Hue allLights={hueData} getHueData={getHueData} />
             {/* <Sonos /> */}
         </div>
     );
