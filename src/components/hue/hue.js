@@ -38,7 +38,12 @@ const Hue = ({ allLights, getHueData }) => {
     };
 
     const toggleColorPicker = ({ idx }) => {
-        setShowPicker(!showPicker);
+        if (selectedLightIdx === idx && showPicker) {
+            setShowPicker(false);
+        } else {
+            setShowPicker(true);
+        }
+
         setSelectedLightIdx(idx);
     };
 
@@ -56,6 +61,32 @@ const Hue = ({ allLights, getHueData }) => {
             body: JSON.stringify({
                 [setting]: value,
             }),
+        });
+    };
+
+    const renderLights = () => {
+        return _.map(allLights, (lt, idx) => {
+            return (
+                <div
+                    className="color-picker-title"
+                    key={lt.name}
+                >
+                    <span onClick={() => { toggleColorPicker({ idx }); }}>
+                        {lt.name}
+                    </span>
+                    <label className="checkbox">
+                        <input
+                            type="checkbox"
+                            onChange={() => {
+                                lightSwitch({ idx });
+                            }}
+                            checked={`${lt.state.on ? 'checked' : ''}`}
+                            name={`${lt.id}`}
+                        />
+                        <span className="checkbox-custom" />
+                    </label>
+                </div>
+            );
         });
     };
 
@@ -102,33 +133,10 @@ const Hue = ({ allLights, getHueData }) => {
     return (allLights
         ? (
             <div className="hue-controls-container">
-                <div>
-                    {_.map(allLights, (lt, idx) => {
-                        return (
-                            <div
-                                className="color-picker-title"
-                                key={lt.name}
-                            >
-                                <span onClick={() => { toggleColorPicker({ idx }); }}>
-                                    {lt.name}
-                                </span>
-                                <label className="checkbox">
-                                    <input
-                                        type="checkbox"
-                                        onChange={() => {
-                                            lightSwitch({ idx });
-                                        }}
-                                        checked={`${lt.state.on ? 'checked' : ''}`}
-                                        name={`${lt.id}`}
-                                    />
-                                    <span className="checkbox-custom" />
-                                </label>
-                            </div>
-                        );
-                    })}
-                </div>
+                {renderLights()}
                 {showPicker && renderColorPicker()}
-            </div>) : null
+            </div>
+        ) : null
     );
 };
 

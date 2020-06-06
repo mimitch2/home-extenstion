@@ -4,6 +4,7 @@
     text-align: left;
     display: flex;
     flex-direction: column;
+    position: relative;
 
     .color-picker-title {
         user-select: none;
@@ -49,7 +50,9 @@
     }
 
     .color-picker-wrapper {
-        // position: absolute;
+        position: absolute;
+        left: -30px;
+        bottom: -30px;
         width: 300px;
         height: 10px;
     }
